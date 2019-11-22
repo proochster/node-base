@@ -1,19 +1,11 @@
-const pathInfo = require('./path-info');
-const os = require('./os-info');
-const processLog = require('./process-info');
-const fsInfo = require('./filesystem-info');
+const express = require('express');
+const app = express();
 
-const Subscription = require('./event-emitter');
-const emitter = new Subscription();
-
-pathInfo(__filename);
-os();
-processLog();
-fsInfo;
-
-emitter.on('userSubscribed', function(eventArg){
-    console.log("User subscribed at", eventArg.date);
-    // Do something when user subscribes
+app.get('/', (req, res) => {
+    res.send('Express posts');
 });
 
-emitter.sendEvent()
+app.listen(3000, () => {console.log('Server listening...')})
+// app.post()
+// app.put()
+// app.delete()
