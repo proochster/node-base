@@ -1,19 +1,51 @@
-const pathInfo = require('./path-info');
-const os = require('./os-info');
-const processLog = require('./process-info');
-const fsInfo = require('./filesystem-info');
+const express = require('express');
+const app = express();
 
-const Subscription = require('./event-emitter');
-const emitter = new Subscription();
+// Enable use of Body element
+app.use(express.json());
 
-pathInfo(__filename);
-os();
-processLog();
-fsInfo;
+const users = [
+    { id: 1, name: 'John' },
+    { id: 2, name: 'Jane' },
+    { id: 3, name: 'Rob' },
+    { id: 4, name: 'Liz' }
+]
 
-emitter.on('userSubscribed', function(eventArg){
-    console.log("User subscribed at", eventArg.date);
-    // Do something when user subscribes
+// Static route
+app.get('/', (req, res) => {
+    res.send('Express posts');
 });
 
-emitter.sendEvent()
+// Dynamic path/value route
+app.get('/users/:id', (req, res) => {
+    const userId = users.find(u => u.id === parseInt(req.params.id));
+    // Return 404 header if the ID doesn't exist and send a message to the user
+    if (!userId) res.status(404).send('No resourse found');
+    // Print ID
+    res.send(userId.name);
+});
+
+// Route withe a qurey parameter handling
+app.get('/users', (req, res) => {
+    // Print object with all parameters
+    res.send(req.query);
+});
+
+// Post to Users
+app.post('/users', (req, res) => {
+    const user = {
+        id: users.length ++,
+        name: req.body.name
+    };
+    // Push to user array
+    users.push(user);
+    // Send back newly created resource back to the user
+    res.send(user);
+});
+
+// Set port
+const port = process.env.PORT || 3000;
+app.listen(port, () => {console.log(`Server listening on port ${port}.`)});
+// app.post()
+// app.put()
+// app.delete()
