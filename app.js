@@ -1,3 +1,4 @@
+const Joi = require('joi');
 const express = require('express');
 const app = express();
 
@@ -9,7 +10,17 @@ const users = [
     { id: 2, name: 'Jane' },
     { id: 3, name: 'Rob' },
     { id: 4, name: 'Liz' }
-]
+];
+
+function validatUser(user){
+    // Set Joi validation schema
+    const schema = {
+        name: Joi.string().min(2).required()
+    }
+    // Put Joi to work
+    console.log(user);
+    return Joi.validate(user, schema);
+}
 
 // Static route
 app.get('/', (req, res) => {
@@ -31,8 +42,19 @@ app.get('/users', (req, res) => {
     res.send(req.query);
 });
 
-// Post to Users
+// Post to Users array
 app.post('/users', (req, res) => {
+
+    // Validate the result
+    const result = validatUser(req.body);
+
+    // Process the error result
+    if (result.error) {
+        res.status(400).send(result.error);
+        console.log("Oh no!", result.error.details[0].message);
+        return;
+    }
+    
     const user = {
         id: users.length ++,
         name: req.body.name
@@ -43,9 +65,31 @@ app.post('/users', (req, res) => {
     res.send(user);
 });
 
+// Route for updating Users array
+app.put('/users/:id', (req, res) => {
+    const userId = users.find(u => u.id === parseInt(req.params.id));
+    // Return 404 header if the ID doesn't exist and send a message to the user
+    if (!userId) res.status(404).send('No resourse found');
+
+    // Validate the result
+    const result = validatUser(req.body);
+
+    // Process the error result
+    if (result.error) {
+        res.status(400).send(result.error);
+        console.log("Oh no!", result.error.details[0].message);
+        return;
+    }
+
+    // Update User record
+    userId.name = req.body.name;
+
+    // Send updated user back to the user
+    res.send(userId);
+   
+});
+
 // Set port
 const port = process.env.PORT || 3000;
 app.listen(port, () => {console.log(`Server listening on port ${port}.`)});
-// app.post()
-// app.put()
 // app.delete()
