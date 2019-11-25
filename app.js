@@ -33,6 +33,11 @@ app.get('/users', (req, res) => {
 
 // Post to Users
 app.post('/users', (req, res) => {
+    // Validate user input. Check if request body contains the name
+    if(!req.body.name || req.body.name.length < 3) {
+        res.status(400).send('Please provide a valid username');
+        return;
+    }
     const user = {
         id: users.length ++,
         name: req.body.name
