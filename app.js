@@ -29,9 +29,13 @@ app.get('/', (req, res) => {
 
 // Dynamic path/value route
 app.get('/users/:id', (req, res) => {
-    const userId = users.find(u => u.id === parseInt(req.params.id));
     // Return 404 header if the ID doesn't exist and send a message to the user
-    if (!userId) res.status(404).send('No resourse found');
+    const userId = users.find(u => u.id === parseInt(req.params.id));
+    if (!userId) {
+        res.status(404).send('No resourse found');
+        return;
+    }
+    
     // Print ID
     res.send(userId.name);
 });
@@ -54,7 +58,7 @@ app.post('/users', (req, res) => {
         console.log("Oh no!", result.error.details[0].message);
         return;
     }
-    
+
     const user = {
         id: users.length ++,
         name: req.body.name
@@ -67,9 +71,12 @@ app.post('/users', (req, res) => {
 
 // Route for updating Users array
 app.put('/users/:id', (req, res) => {
-    const userId = users.find(u => u.id === parseInt(req.params.id));
     // Return 404 header if the ID doesn't exist and send a message to the user
-    if (!userId) res.status(404).send('No resourse found');
+    const userId = users.find(u => u.id === parseInt(req.params.id));
+    if (!userId) {
+        res.status(404).send('No resourse found');
+        return;
+    }
 
     // Validate the result
     const result = validatUser(req.body);
@@ -86,7 +93,22 @@ app.put('/users/:id', (req, res) => {
 
     // Send updated user back to the user
     res.send(userId);
-   
+});
+
+app.delete('/users/:id', (req, res) => {
+    // Return 404 header if the ID doesn't exist and send a message to the user
+    const userId = users.find(u => u.id === parseInt(req.params.id));
+    if (!userId) {
+        res.status(404).send('No resourse found');
+        return;
+    }
+
+    // Delete user
+    const index = users.indexOf(userId);
+    console.log(index);
+    users.splice(index, 1);
+
+    res.send(users);
 });
 
 // Set port
