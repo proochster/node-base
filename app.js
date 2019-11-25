@@ -1,3 +1,4 @@
+const Joi = require('joi');
 const express = require('express');
 const app = express();
 
@@ -31,11 +32,20 @@ app.get('/users', (req, res) => {
     res.send(req.query);
 });
 
-// Post to Users
+// Post to Users array
 app.post('/users', (req, res) => {
-    // Validate user input. Check if request body contains the name
-    if(!req.body.name || req.body.name.length < 3) {
-        res.status(400).send('Please provide a valid username');
+    // Set Joi validation schema
+    const schema = {
+        name: Joi.string().min(2).required()
+    }
+    // Put Joi to work
+    const result = Joi.validate(req.body, schema);
+    console.log(result);
+
+    // Process the result
+    if (result.error) {
+        res.status(400).send(result.error);
+        console.log("Oh no!", result.error.details[0].message);
         return;
     }
     const user = {
@@ -46,6 +56,11 @@ app.post('/users', (req, res) => {
     users.push(user);
     // Send back newly created resource back to the user
     res.send(user);
+});
+
+// Route for updating Users array
+app.put('/users/:id', (req, res) => {
+    
 });
 
 // Set port
